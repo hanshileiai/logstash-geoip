@@ -1,0 +1,32 @@
+version: "2"
+services: 
+  # logstash-geoip
+  logstash:
+    image: logstash:6.8.0
+    volumes:
+      - ./images/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./images/logstash/config/logstash.conf:/usr/share/logstash/config/logstash.conf
+      - ./data/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./data/logstash/myapplication:/var/log/GDPR/myapplication
+      - ./logs/nginx:/var/log/nginx
+    command: logstash -f /usr/share/logstash/config/logstash.conf
+    ports:
+      - "5000:5000"
+    container_name: logstash
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+    restart: always
+    networks: [vpcbr]
+
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.0.0.0/16
+         gateway: 10.0.0.1
