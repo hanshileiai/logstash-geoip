@@ -1,5 +1,7 @@
 FROM logstash:6.8.0
 
+USER root
+
 RUN yum update -y && \
   yum install -y wget && \
   cd /usr/local/src/ && \
